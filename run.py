@@ -33,17 +33,19 @@ symbol = ser.read_until('\n')
 while True:
     value = int(ser.read_until('\n'))
     data += '{},{}\n'.format(datetime.now(), value)
-    # print(data)
-    r = requests.patch('https://api.github.com/gists/' + gist_id,
-                       data=json.dumps({
-                           'description': '',
-                           'files': {
-                               filename: {
-                                   'content': data,
-                                   'filename': filename
+    try:
+        r = requests.patch('https://api.github.com/gists/' + gist_id,
+                           data=json.dumps({
+                               'description': '',
+                               'files': {
+                                   filename: {
+                                       'content': data,
+                                       'filename': filename
+                                   }
                                }
-                           }
-                       }),
-                       headers=headers)
+                           }),
+                           headers=headers)
+    except requests.exceptions.ConnectionError as e:
+        print(e)
 
 ser.close()
